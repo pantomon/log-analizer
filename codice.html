@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantom Log analizer 1.0</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 90%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #output {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            text-align: left;
+            max-width: 100%;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Carica un file di log</h2>
+        <input type="file" id="fileInput">
+        <input type="text" id="searchText" placeholder="pantom ha accettato l'assistenza di">
+        <button id="searchButton">Cerca</button>
+        <h3>Risultati:</h3>
+        <p id="count">Occorrenze trovate: 0</p>
+        <div id="output"></div>
+    </div>
+    
+    <script>
+        let fileContent = "";
+        
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                fileContent = e.target.result.replace(/\r/g, ""); // Rimuove i caratteri \r per uniformità
+                console.log("File caricato:", fileContent); // Debug: Mostra il contenuto del file
+                alert("File caricato con successo! Ora puoi cercare.");
+            };
+            
+            reader.readAsText(file);
+        });
+        
+        document.getElementById('searchButton').addEventListener('click', function() {
+            if (!fileContent) {
+                alert('Carica prima un file!');
+                return;
+            }
+            
+            const searchText = document.getElementById('searchText').value.trim();
+            if (!searchText) {
+                alert('Inserisci un testo da cercare!');
+                return;
+            }
+            
+            console.log("Testo da cercare:", searchText); // Debug: Mostra il testo cercato
+            
+            const regex = new RegExp(`.*${searchText}.*`, 'gi'); // Cerca l'intera riga che contiene il testo
+            const matches = fileContent.split('\n').filter(line => line.match(regex)); // Trova tutte le righe che contengono il testo
+            
+            console.log("Numero di occorrenze trovate:", matches.length); // Debug: Mostra il numero di occorrenze trovate
+            
+            document.getElementById('count').textContent = `Occorrenze di "${searchText}": ${matches.length}`;
+            document.getElementById('output').textContent = matches.length > 0 ? matches.join('\n') : "Nessuna corrispondenza trovata.";
+        });
+    </script>
+</body>
+</html>
